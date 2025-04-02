@@ -8,13 +8,16 @@ import { generateImage } from "@/services/imageService";
 import { toast } from "sonner";
 import { Github, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState<Array<{ url: string; prompt: string }>>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleGenerateImage = async (prompt: string) => {
     setIsLoading(true);
+    setError(null);
     
     try {
       const imageUrls = await generateImage(prompt);
@@ -28,7 +31,9 @@ const Index = () => {
       toast.success("Image generated successfully!");
     } catch (error) {
       console.error("Error:", error);
-      toast.error("Failed to generate image. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate image. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -60,6 +65,14 @@ const Index = () => {
               Use the power of DALL·E to generate stunning, creative images from your text descriptions.
             </p>
           </div>
+
+          {/* Error alert */}
+          {error && (
+            <Alert variant="destructive" className="mb-6 max-w-2xl mx-auto">
+              <AlertTitle>Generation Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
           {/* Prompt input */}
           <div className="w-full max-w-2xl mx-auto mb-10">

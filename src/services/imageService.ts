@@ -8,6 +8,15 @@ interface GenerateImageResponse {
   created: number;
 }
 
+interface ErrorResponse {
+  error: {
+    code: string;
+    message: string;
+    param: string | null;
+    type: string;
+  };
+}
+
 export async function generateImage(prompt: string): Promise<string[]> {
   try {
     const response = await fetch("https://api.openai.com/v1/images/generations", {
@@ -25,8 +34,16 @@ export async function generateImage(prompt: string): Promise<string[]> {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || "Failed to generate image");
+      const errorData = await response.json() as ErrorResponse;
+      
+      // Handle specific error codes
+      if (errorData.error?.code === "billing_hard_limit_reached") {
+        throw new Error("API account has reached its billing limit. Please check your OpenAI account.");
+      } else if (errorData.error?.code === "rate_limit_exceeded") {
+        throw new Error("Rate limit exceeded. Please try again in a few moments.");
+      } else {
+        throw new Error(errorData.error?.message || "Failed to generate image");
+      }
     }
 
     const data = await response.json() as GenerateImageResponse;
