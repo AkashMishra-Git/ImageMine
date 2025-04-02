@@ -1,6 +1,5 @@
-
 // You can replace this with your own API key if needed
-const API_KEY = "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";
+const API_KEY = "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";
 
 interface GenerateImageResponse {
   data: Array<{
@@ -30,7 +29,7 @@ export async function generateImage(prompt: string, customApiKey?: string): Prom
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "dall-e-2", // Try using dall-e-2 which might have different billing requirements
+        model: "dall-e-2", // Using dall-e-2 which might have different billing requirements
         prompt: prompt,
         n: 1,
         size: "1024x1024",
